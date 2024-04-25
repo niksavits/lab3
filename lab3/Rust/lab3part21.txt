@@ -1,0 +1,83 @@
+use std::io;
+
+// Функция mod_pow выполняет возведение в степень по модулю.
+fn mod_pow(mut a: i64, mut b: i64, m: i64) -> i64 {
+    let mut result = 1;
+    a %= m;
+    while b > 0 {
+        if b % 2 == 1 {
+            result = (result * a) % m;
+        }
+        a = (a * a) % m;
+        b /= 2;
+    }
+    result
+}
+
+// Функция is_prime проверяет, является ли число простым.
+fn is_prime(p: i64) -> bool {
+    if p <= 1 {
+        return false;
+    }
+    if p <= 3 {
+        return true;
+    }
+    if p % 2 == 0 || p % 3 == 0 {
+        return false;
+    }
+
+    let mut i = 5;
+    while i * i <= p {
+        if p % i == 0 || p % (i + 2) == 0 {
+            return false;
+        }
+        i += 6;
+    }
+    true
+}
+
+// Функция generate_provable_prime генерирует простое число по заданным параметрам.
+fn generate_provable_prime(t: i32, q: i64) -> i64 {
+    let mut n = (1 << (t - 1)) / q;
+    if (1 << (t - 1)) % q != 0 {
+        n += 1;
+    }
+    if n % 2 != 0 {
+        n += 1;
+    }
+
+    let mut u = 0;
+    let mut p = 0; // Объявляем переменную p до цикла
+    loop {
+        p = (n + u) * q + 1; // Используем p в цикле
+
+        if p >= (1 << t) {
+            n += 2;
+            u = 0;
+            continue;
+        }
+
+        if mod_pow(2, p - 1, p) == 1 && mod_pow(2, n + u, p) != 1 {
+            if is_prime(p) {
+                break;
+            }
+        }
+        u += 2;
+    }
+    p
+}
+
+fn main() {
+    println!("Введите размерность:");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Ошибка чтения ввода");
+    let t: i32 = input.trim().parse().expect("Неверный ввод");
+
+    println!("Введите малое простое число:");
+    input.clear();
+    io::stdin().read_line(&mut input).expect("Ошибка чтения ввода");
+    let q: i64 = input.trim().parse().expect("Неверный ввод");
+
+    let p = generate_provable_prime(t, q);
+    println!("Сгенерированное простое число: {}", p);
+}

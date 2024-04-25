@@ -1,0 +1,101 @@
+use std::collections::HashSet;
+use std::io;
+use rand::Rng;
+
+fn build_f(q: &HashSet<i64>) -> i64 {
+    let mut f = 1;
+    for elem in q.iter() {
+        f *= elem;
+    }
+    f
+}
+
+fn build_r(f: i64) -> i64 {
+    let mut rng = rand::thread_rng();
+    rng.gen_range(0..(f / 2)) * 2 // Генерируем четное случайное число меньше F
+}
+
+fn build_n(r: i64, f: i64) -> i64 {
+    r * f + 1
+}
+
+fn build_a(n: i64) -> i64 {
+    let mut rng = rand::thread_rng();
+    rng.gen_range(2..(n - 2)) // Выбираем случайное число a в интервале (2, n-2)
+}
+
+fn power(a: i64, mut b: i64, n: i64) -> i64 {
+    let mut result = 1;
+    let mut a_mod = a % n;
+    while b > 0 {
+        if b & 1 == 1 {
+            result = (result * a_mod) % n;
+        }
+        b >>= 1;
+        a_mod = (a_mod * a_mod) % n;
+    }
+    result
+}
+
+fn poklington_test(n: i64, t: i32, q: &HashSet<i64>) -> bool {
+    if n <= 1 {
+        return false;
+    }
+    if n <= 3 {
+        return true;
+    }
+    if n % 2 == 0 {
+        return false;
+    }
+
+    let f = build_f(q);
+    let mut _rng = rand::thread_rng();
+    for _ in 0..t {
+        let r = build_r(f);
+        let constructed_n = build_n(r, f);
+        let a = build_a(n);
+        let x = power(a, f * r, constructed_n);
+        if x != 1 {
+            return false;
+        }
+        let x = power(a, f, constructed_n);
+        if x != n - 1 {
+            return false;
+        }
+    }
+    true
+}
+
+
+fn main() {
+    let mut q = HashSet::new();
+
+    println!("Введите число для проверки (n):");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+    let n: i64 = input.trim().parse().expect("Ошибка при парсинге числа n.");
+
+    println!("Введите параметр надежности (t):");
+    input.clear();
+    io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+    let t: i32 = input.trim().parse().expect("Ошибка при парсинге числа t.");
+
+    println!("Введите количество элементов множества q:");
+    input.clear();
+    io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+    let q_size: usize = input.trim().parse().expect("Ошибка при парсинге размера множества q.");
+
+    println!("Введите элементы множества q:");
+    for _ in 0..q_size {
+        input.clear();
+        io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+        let elem: i64 = input.trim().parse().expect("Ошибка при парсинге элемента множества q.");
+        q.insert(elem);
+    }
+
+    if poklington_test(n, t, &q) {
+        println!("Вероятно, что {} - простое число.", n);
+    } else {
+        println!("{} - составное число.", n);
+    }
+}

@@ -1,0 +1,27 @@
+use std::io;
+
+// Функция для нахождения всех делителей числа
+fn find_divisors(n: i32) -> Vec<i32> {
+    let mut divisors = Vec::new(); // Вектор для хранения делителей
+    for i in 1..=n { // Перебор всех чисел от 1 до n
+        if n % i == 0 { // Если число делится на i без остатка
+            divisors.push(i); // Добавляем i в вектор делителей
+        }
+    }
+    divisors // Возвращаем вектор делителей
+}
+
+fn main() {
+    println!("Введите число: ");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Failed to read input");
+    let number: i32 = input.trim().parse().expect("Invalid input");
+
+    let divisors = find_divisors(number);
+
+    print!("Делители числа {}: ", number);
+    for divisor in &divisors {
+        print!("{} ", divisor);
+    }
+    println!();
+}

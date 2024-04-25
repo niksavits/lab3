@@ -1,0 +1,41 @@
+use std::io;
+use std::io::Write;
+
+fn main() {
+    let mut input = String::new();
+
+    print!("Enter a step: ");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut input).expect("Failed to read input");
+    let dx: f64 = input.trim().parse().expect("Invalid input");
+
+    println!("{:<3} {:<3}", "y", "x");
+
+    // Парабола
+    for x in (-6..=-2).map(|x| x as f64).step_by((dx as usize).max(1)) {
+        let y = -(x * x) - 7.0 * x - 10.0;
+        println!("{:.3} {:.3}", y, x);
+    }
+    println!("___________");
+
+    // Окружность
+    for x in (-2..=2).map(|x| x as f64).step_by((dx as usize).max(1)) {
+        let r = 2.0;
+        let y = (r * r - x * x).sqrt();
+        println!("{:.3} {:.3}", y, x);
+    }
+    println!("___________");
+
+    // Логарифм
+    for x in (2..=8).map(|x| x as f64).step_by((dx as usize).max(1)) {
+        let y = x.log2() - 1.0;
+        println!("{:.3} {:.3}", y, x);
+    }
+    println!("___________");
+
+    // Прямая
+    for x in (8..=9).map(|x| x as f64).step_by((dx as usize).max(1)) {
+        let y = -2.0 * x + 18.0;
+        println!("{:.3} {:.3}", y, x);
+    }
+}

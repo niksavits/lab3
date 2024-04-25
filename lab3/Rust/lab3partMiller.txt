@@ -1,0 +1,70 @@
+use std::collections::HashSet;
+use std::io;
+use rand::Rng;
+
+// Функция для быстрого возведения числа a в степень b по модулю n
+fn increase_degree(a: i64, mut b: i64, n: i64) -> i64 {
+    let mut result = 1;
+    let mut a_mod = a % n;
+    while b > 0 {
+        if b % 2 == 1 {
+            result = (result * a_mod) % n;
+        }
+        a_mod = (a_mod * a_mod) % n;
+        b /= 2;
+    }
+    result
+}
+
+// Функция для проверки числа на простоту по тесту Миллера-Рабина
+fn miller(n: i64, t: i32) -> bool {
+    if n <= 1 || n == 4 {
+        return false;
+    }
+    if n <= 3 {
+        return true;
+    }
+
+    let mut rng = rand::thread_rng();
+    for _ in 0..t {
+        let a: i64 = rng.gen_range(2..n - 1); // исправлено здесь
+        let x = increase_degree(a, n - 1, n);
+        if x != 1 {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn main() {
+    println!("Введите число для проверки (n):");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+    let n: i64 = input.trim().parse().expect("Ошибка при парсинге числа n.");
+
+    println!("Введите количество итераций (t):");
+    input.clear();
+    io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+    let t: i32 = input.trim().parse().expect("Ошибка при парсинге числа t.");
+
+    println!("Введите размер множества чисел q:");
+    input.clear();
+    io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+    let q_size: usize = input.trim().parse().expect("Ошибка при парсинге размера множества q.");
+
+    let mut q = HashSet::new();
+    println!("Введите элементы множества q:");
+    for _ in 0..q_size {
+        input.clear();
+        io::stdin().read_line(&mut input).expect("Ошибка при чтении ввода.");
+        let elem: i32 = input.trim().parse().expect("Ошибка при парсинге элемента множества q.");
+        q.insert(elem);
+    }
+
+    if miller(n, t) {
+        println!("n - простое число");
+    } else {
+        println!("Ошибка, n - составное число");
+    }
+}
